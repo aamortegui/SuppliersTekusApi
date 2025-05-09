@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\Tekus.Suppliers.WebApi.props" />
+</Project>
