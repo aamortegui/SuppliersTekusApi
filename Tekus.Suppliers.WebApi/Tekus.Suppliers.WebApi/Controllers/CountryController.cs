@@ -22,10 +22,10 @@ namespace Tekus.Suppliers.WebApi.Controllers
 
         [HttpGet("all-countries")]
         [OutputCache(Tags = [cacheTag])]
-        public async Task<IActionResult> GetCountries()
+        public async Task<IActionResult> GetCountries([FromQuery] PaginationDTO pagination)
         {
             
-            ResponseDto? response = await _countryService.GetAllCountriesAsync();
+            ResponseDto? response = await _countryService.GetAllCountriesAsync(pagination);
 
             if(response is not null && response.IsSuccess)
             {

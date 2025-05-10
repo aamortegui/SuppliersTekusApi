@@ -18,7 +18,7 @@ namespace Tekus.Suppliers.WebApi.Application.Services
         {
             _baseService = baseService;
         }
-        public async Task<ResponseDto?> GetAllCountriesAsync()
+        public async Task<ResponseDto?> GetAllCountriesAsync(PaginationDTO pagination)
         {
             var response = await _baseService.GetAllCountriesAsync(new Request()
             {
@@ -26,17 +26,23 @@ namespace Tekus.Suppliers.WebApi.Application.Services
                 Url = StaticDetails.CountryAPIBase + "/all",
             });
 
+            var mappedCountries = response?.Countries?
+                .Select(dto => new CountryDto
+                {
+                    Name = new PropertyNameDto
+                    {
+                        Common = dto.Name.Common,
+                        Official = dto.Name.Official
+                    }
+                });
+           
+            var orderedCountries = mappedCountries?.OrderBy(x => x.Name.Common);
+            var pagedCountries = orderedCountries?.Paginate(pagination);
+
             return new ResponseDto()
             {
-                IsSuccess = response.IsSuccess,                
-                Countries = response?.Countries?.Select(dto => new CountryDto 
-                {
-                    Name = new PropertyNameDto 
-                    { 
-                        Common = dto.Name.Common, 
-                        Official= dto.Name.Official
-                    },
-                }).OrderBy(x => x.Name.Common).ToList(),
+                IsSuccess = response.IsSuccess,
+                Countries = pagedCountries?.ToList(),
                 Message = response.Message
             };
         }

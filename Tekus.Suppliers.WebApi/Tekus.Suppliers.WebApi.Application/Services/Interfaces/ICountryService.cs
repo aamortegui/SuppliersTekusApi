@@ -9,6 +9,6 @@ namespace Tekus.Suppliers.WebApi.Application.Services.Interfaces
 {
     public interface ICountryService
     {
-        Task<ResponseDto?> GetAllCountriesAsync();
+        Task<ResponseDto?> GetAllCountriesAsync(PaginationDTO pagination);
     }
 }
