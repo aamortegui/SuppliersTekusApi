@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Tekus.Suppliers.WebApi.Domain\Tekus.Suppliers.WebApi.Domain.csproj" />
+    <ProjectReference Include="..\Tekus.Suppliers.WebApi.Infrastructure\Tekus.Suppliers.WebApi.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
