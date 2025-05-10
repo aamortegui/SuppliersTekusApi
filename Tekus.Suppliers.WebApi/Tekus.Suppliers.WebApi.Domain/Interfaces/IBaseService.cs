@@ -10,5 +10,6 @@ namespace Tekus.Suppliers.WebApi.Domain.Interfaces
     public interface IBaseService
     {
         Task<Response?> GetCountriesAsync(Request requestApi);
+        Task<bool> SyncCountriesToDatabaseAsync();
     }
 }
