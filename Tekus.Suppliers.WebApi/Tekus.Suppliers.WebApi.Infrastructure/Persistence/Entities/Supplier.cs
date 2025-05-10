@@ -10,5 +10,6 @@ namespace Tekus.Suppliers.WebApi.Infrastructure.Persistence.Entities
         public string NIT { get; set; } = string.Empty;
         [Required]
         public string Name { get; set; } = string.Empty;
+        public string CustomField { get; set; } = string.Empty;
     }
 }

@@ -7,7 +7,7 @@ using Tekus.Suppliers.WebApi.Application.DTOs;
 
 namespace Tekus.Suppliers.WebApi.Domain.Common
 {
-    public static class ICollectionExtension
+    public static class IEnumerableExtension
     {
         public static IEnumerable<T>Paginate<T>(this IEnumerable<T>collectionable, 
             PaginationDTO pagination)

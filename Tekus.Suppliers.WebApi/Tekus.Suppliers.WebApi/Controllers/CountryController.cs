@@ -29,12 +29,27 @@ namespace Tekus.Suppliers.WebApi.Controllers
 
             if(response is not null && response.IsSuccess)
             {
-                return Ok( response.Countries);               
+                return Ok( response);               
             }
             else
             {
                 return BadRequest(new { message = response?.Message });
             }            
+        }
+        [HttpGet("get-country/{name}")]
+        [OutputCache(Tags = [cacheTag])]
+        public async Task<IActionResult> GetCountry(string name)
+        {
+            ResponseDto? response = await _countryService.GetCountryAsync(name);
+
+            if (response is not null && response.IsSuccess)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return BadRequest(new { message = response?.Message });
+            }
         }
     }
 }

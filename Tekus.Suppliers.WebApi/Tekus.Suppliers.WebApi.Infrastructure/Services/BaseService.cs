@@ -20,7 +20,7 @@ namespace Tekus.Suppliers.WebApi.Infrastructure.Services
         {
             _httpClientFactory = httpClientFactory;
         }
-        public async Task<Response?> GetAllCountriesAsync(Request requestApi)
+        public async Task<Response?> GetCountriesAsync(Request requestApi)
         {
             try
             {

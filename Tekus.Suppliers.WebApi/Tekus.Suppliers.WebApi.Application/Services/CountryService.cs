@@ -20,7 +20,7 @@ namespace Tekus.Suppliers.WebApi.Application.Services
         }
         public async Task<ResponseDto?> GetAllCountriesAsync(PaginationDTO pagination)
         {
-            var response = await _baseService.GetAllCountriesAsync(new Request()
+            var response = await _baseService.GetCountriesAsync(new Request()
             {
                 ApiType = StaticDetails.ApiType.GET,
                 Url = StaticDetails.CountryAPIBase + "/all",
@@ -43,6 +43,30 @@ namespace Tekus.Suppliers.WebApi.Application.Services
             {
                 IsSuccess = response.IsSuccess,
                 Countries = pagedCountries?.ToList(),
+                Message = response.Message
+            };
+        }
+        public async Task<ResponseDto?> GetCountryAsync(string name)
+        {
+            var response = await _baseService.GetCountriesAsync(new Request()
+            {
+                ApiType = StaticDetails.ApiType.GET,
+                Url = StaticDetails.CountryAPIBase + "/name/"+ name
+            });
+            var mappedCountries = response?.Countries?
+                .Select(dto => new CountryDto
+                {
+                    Name = new PropertyNameDto
+                    {
+                        Common = dto.Name.Common,
+                        Official = dto.Name.Official
+                    }
+                });
+
+            return new ResponseDto()
+            {
+                IsSuccess = response.IsSuccess,
+                Countries = mappedCountries?.ToList(),
                 Message = response.Message
             };
         }
