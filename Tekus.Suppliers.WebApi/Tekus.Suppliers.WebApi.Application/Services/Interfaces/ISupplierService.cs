@@ -7,9 +7,9 @@ using Tekus.Suppliers.WebApi.Application.DTOs;
 
 namespace Tekus.Suppliers.WebApi.Application.Services.Interfaces
 {
-    public interface ICountryService
+    public interface ISupplierService
     {
-        Task<ResponseCountryDto?> GetAllCountriesAsync(PaginationDTO pagination);
-        Task<ResponseCountryDto?> GetCountryAsync(string name);
+        Task<ResponseDto> GetAllSuppliersAsyc(SupplierFilterDto supplierFilterDto);
+        Task<ResponseDto> CreateSupplier(SupplierCreationDto supplierCreationDto);
     }
 }

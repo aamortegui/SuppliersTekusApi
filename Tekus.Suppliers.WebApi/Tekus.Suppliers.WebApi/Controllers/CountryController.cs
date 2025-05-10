@@ -25,7 +25,7 @@ namespace Tekus.Suppliers.WebApi.Controllers
         public async Task<IActionResult> GetCountries([FromQuery] PaginationDTO pagination)
         {
             
-            ResponseDto? response = await _countryService.GetAllCountriesAsync(pagination);
+            ResponseCountryDto? response = await _countryService.GetAllCountriesAsync(pagination);
 
             if(response is not null && response.IsSuccess)
             {
@@ -40,7 +40,7 @@ namespace Tekus.Suppliers.WebApi.Controllers
         [OutputCache(Tags = [cacheTag])]
         public async Task<IActionResult> GetCountry(string name)
         {
-            ResponseDto? response = await _countryService.GetCountryAsync(name);
+            ResponseCountryDto? response = await _countryService.GetCountryAsync(name);
 
             if (response is not null && response.IsSuccess)
             {

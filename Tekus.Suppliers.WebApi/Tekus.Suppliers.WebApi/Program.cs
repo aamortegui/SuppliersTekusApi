@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
 using Tekus.Suppliers.WebApi.Infrastructure;
 using System;
+using Tekus.Suppliers.WebApi.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSwaggerGen();
@@ -22,6 +23,8 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient<ICountryService, CountryService>();
 builder.Services.AddScoped<IBaseService, BaseService>();
 builder.Services.AddScoped<ICountryService, CountryService>();
+builder.Services.AddScoped<ISupplierService, SupplierService>();
+builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
 StaticDetails.CountryAPIBase = builder.Configuration["ServiceUrls:CountryAPI"];
 
 builder.Services.AddDbContext<ServiceSuppliersDBContext>(options =>

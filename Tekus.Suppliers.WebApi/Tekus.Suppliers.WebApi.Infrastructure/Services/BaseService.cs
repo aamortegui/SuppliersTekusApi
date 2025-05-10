@@ -24,7 +24,7 @@ namespace Tekus.Suppliers.WebApi.Infrastructure.Services
             _httpClientFactory = httpClientFactory;
             _context = context;
         }
-        public async Task<Response?> GetCountriesAsync(Request requestApi)
+        public async Task<ResponseCountry?> GetCountriesAsync(Request requestApi)
         {
             try
             {
@@ -73,7 +73,7 @@ namespace Tekus.Suppliers.WebApi.Infrastructure.Services
 
 
 
-                        return new Response()
+                        return new ResponseCountry()
                         {
                             IsSuccess = true,
                             Countries = apiCountryDto
@@ -82,7 +82,7 @@ namespace Tekus.Suppliers.WebApi.Infrastructure.Services
             }
             catch (Exception ex)
             {
-                var response = new Response()
+                var response = new ResponseCountry()
                 {
                     IsSuccess = false,
                     Message = ex.Message

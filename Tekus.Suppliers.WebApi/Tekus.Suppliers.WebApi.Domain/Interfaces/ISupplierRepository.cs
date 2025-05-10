@@ -7,9 +7,9 @@ using Tekus.Suppliers.WebApi.Domain.Entities;
 
 namespace Tekus.Suppliers.WebApi.Domain.Interfaces
 {
-    public interface IBaseService
+    public interface ISupplierRepository
     {
-        Task<ResponseCountry?> GetCountriesAsync(Request requestApi);
-        Task<bool> SyncCountriesToDatabaseAsync();
+        Task<Response> GetAllSuppliersAsync(SupplierFilter supplierFilter);
+        Task<Response> CreateSupplierAsync(Supplier supplier);
     }
 }
