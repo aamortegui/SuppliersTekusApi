@@ -12,6 +12,7 @@ using System.Linq.Dynamic.Core;
 using Tekus.Suppliers.WebApi.Infrastructure.Persistence.Entities;
 using Supplier = Tekus.Suppliers.WebApi.Domain.Entities.Supplier;
 using Microsoft.Extensions.Configuration;
+using CustomField = Tekus.Suppliers.WebApi.Infrastructure.Persistence.Entities.CustomField;
 
 namespace Tekus.Suppliers.WebApi.Infrastructure.Repositories
 {
@@ -46,9 +47,10 @@ namespace Tekus.Suppliers.WebApi.Infrastructure.Repositories
                 }
                 if (!string.IsNullOrEmpty(supplierFilter.NIT))
                 {
-                    suppliersQueryabale = suppliersQueryabale.Where(x => x.NIT.Contains(supplierFilter.NIT));                }
+                    suppliersQueryabale = suppliersQueryabale.Where(x => x.NIT.Contains(supplierFilter.NIT));
+                }
 
-                
+
                 string? upperOrderBy = supplierFilter.OrderBy?.ToUpper();
                 if (!string.IsNullOrEmpty(supplierFilter.OrderBy) && _allowedOrderFields.Contains(upperOrderBy))
                 {
@@ -109,7 +111,7 @@ namespace Tekus.Suppliers.WebApi.Infrastructure.Repositories
                 return response;
             }
 
-                using var transaction = await _context.Database.BeginTransactionAsync();
+            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
                 var supplierEntity = new Persistence.Entities.Supplier()
@@ -140,6 +142,81 @@ namespace Tekus.Suppliers.WebApi.Infrastructure.Repositories
                 response.Message = ex.Message;
             }
             return response;
+        }
+
+        public async Task UpdateSupplierAsync(Supplier supplier)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                var existingSupplier = await _context.Suppliers
+                    .Include(x => x.CustomFields)
+                    .FirstOrDefaultAsync(x => x.Id == supplier.Id);
+
+                if (existingSupplier is null)
+                {
+                    throw new KeyNotFoundException("Supplier not found");
+                }
+                if (!string.IsNullOrEmpty(supplier.Name))
+                    existingSupplier.Name = supplier.Name;
+
+                if (!string.IsNullOrEmpty(supplier.NIT))
+                    existingSupplier.NIT = supplier.NIT;
+
+                // Update custom fields
+                // Remove custom fields that are not in the new list
+                if (supplier.CustomFields is not null && supplier.CustomFields.Any())
+                {
+                    // Remove custom fields that are not in the new list using TOHashSet for better performance searching IDs
+                    var incomingFieldNames = supplier.CustomFields
+                        .Select(cf => cf.FieldName)
+                        .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+
+                    var toRemove = existingSupplier.CustomFields
+                        .Where(cf => !incomingFieldNames.Contains(cf.FieldName))
+                        .ToList();
+
+                    foreach (var removed in toRemove)
+                    {
+                        _context.CustomFields.Remove(removed);
+                    }
+                    // Add or update custom fields
+                    foreach (var incoming in supplier.CustomFields)
+                    {
+                        if (string.IsNullOrWhiteSpace(incoming.FieldName) || string.IsNullOrWhiteSpace(incoming.FieldValue))
+                            continue;
+
+                        var existing = existingSupplier.CustomFields
+                            .FirstOrDefault(cf => cf.FieldName.Equals(incoming.FieldName, StringComparison.OrdinalIgnoreCase));
+
+                        if (existing != null)
+                        {
+                            existing.FieldName = incoming.FieldName;
+                            existing.FieldValue = incoming.FieldValue;
+                        }
+                        else
+                        {
+                            var newCustomField = new CustomField
+                            {
+                                Id = Guid.NewGuid(),
+                                SupplierId = existingSupplier.Id,
+                                FieldName = incoming.FieldName,
+                                FieldValue = incoming.FieldValue
+                            };
+                            _context.Entry(newCustomField).State = EntityState.Added;
+                        }
+                    }
+                }
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+            }
+            catch (Exception ex) 
+            {
+                await transaction.RollbackAsync();
+                throw new Exception($"Error updating supplier: {ex.Message}", ex);
+            }            
         }
     }
 }

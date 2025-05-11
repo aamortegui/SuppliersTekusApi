@@ -12,5 +12,6 @@ namespace Tekus.Suppliers.WebApi.Application.Services.Interfaces
         Task<ResponseDto> GetAllSuppliersAsyc(SupplierFilterDto supplierFilterDto);
         Task<ResponseDto> GetSupplierByIdAsync(Guid id);
         Task<ResponseDto> CreateSupplier(SupplierCreationDto supplierCreationDto);
+        Task UpdateSupplier(Guid id, SupplierCreationDto supplierCreationDto);
     }
 }

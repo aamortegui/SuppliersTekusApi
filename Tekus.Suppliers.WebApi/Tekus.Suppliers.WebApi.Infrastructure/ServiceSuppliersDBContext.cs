@@ -56,11 +56,13 @@ namespace Tekus.Suppliers.WebApi.Infrastructure
                 .HasForeignKey(sc => sc.CountryId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            
+
             modelBuilder.Entity<CustomField>()
                 .HasOne(cf => cf.Supplier)
                 .WithMany(s => s.CustomFields)
                 .HasForeignKey(cf => cf.SupplierId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Cascade);            
         }
     }
 }

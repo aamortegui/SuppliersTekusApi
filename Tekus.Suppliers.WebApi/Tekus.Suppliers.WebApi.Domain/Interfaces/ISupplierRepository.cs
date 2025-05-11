@@ -12,5 +12,6 @@ namespace Tekus.Suppliers.WebApi.Domain.Interfaces
         Task<Response> GetAllSuppliersAsync(SupplierFilter supplierFilter);
         Task<Response> GetSupplierByIdAsync(Guid supplierId);
         Task<Response> CreateSupplierAsync(Supplier supplier);
+        Task UpdateSupplierAsync(Supplier supplier);
     }
 }

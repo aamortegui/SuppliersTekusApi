@@ -75,5 +75,22 @@ namespace Tekus.Suppliers.WebApi.Application.Services
                 Result = response.Result
             };
         }
+        public async Task UpdateSupplier(Guid id, SupplierCreationDto supplierCreationDto)
+        {
+            var supplier = new Supplier()
+            {
+                Id = id,
+                Name = supplierCreationDto.Name,
+                NIT = supplierCreationDto.NIT,
+                CustomFields = supplierCreationDto.CustomFields.Select(x => new CustomField()
+                {
+                    SupplierId = id,
+                    FieldName = x.FieldName,
+                    FieldValue = x.FieldValue
+                }).ToList()
+            };
+            
+            await _supplierRepository.UpdateSupplierAsync(supplier);            
+        }
     }
 }

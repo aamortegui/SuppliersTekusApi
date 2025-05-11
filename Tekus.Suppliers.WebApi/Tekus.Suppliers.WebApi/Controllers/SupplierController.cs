@@ -89,5 +89,21 @@ namespace Tekus.Suppliers.WebApi.Controllers
 
             return CreatedAtRoute("GetSupplierById", new { id = supplier.Id }, supplier);
         }
+
+        [HttpPut("{id}", Name ="Edit")]
+        public async Task<ActionResult>Put(Guid id, [FromBody] SupplierCreationDto supplierCreationDto)
+        {
+            if(id == Guid.Empty)
+            {
+                return BadRequest("Invalid supplier ID.");
+            }
+            if (supplierCreationDto == null)
+            {
+                return BadRequest("Supplier data is required.");
+            }
+            await _supplierService.UpdateSupplier(id, supplierCreationDto);
+
+            return NoContent();
+        }
     }
 }
