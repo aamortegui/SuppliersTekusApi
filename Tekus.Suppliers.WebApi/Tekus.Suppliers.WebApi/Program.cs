@@ -25,6 +25,8 @@ builder.Services.AddScoped<IBaseService, BaseService>();
 builder.Services.AddScoped<ICountryService, CountryService>();
 builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
+builder.Services.AddScoped<IServiceSupplierService, ServiceSupplierService>();
+builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 StaticDetails.CountryAPIBase = builder.Configuration["ServiceUrls:CountryAPI"];
 
 builder.Services.AddDbContext<ServiceSuppliersDBContext>(options =>

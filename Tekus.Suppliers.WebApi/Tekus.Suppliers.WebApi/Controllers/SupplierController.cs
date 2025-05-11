@@ -29,7 +29,7 @@ namespace Tekus.Suppliers.WebApi.Controllers
 
             var supplierEntities = response.Result as List<Supplier>;
                         
-            var suppliers = supplierEntities.Select(s => new SupplierResponseDto
+            var suppliers = supplierEntities?.Select(s => new SupplierResponseDto
             {
                 Id = s.Id,
                 Name = s.Name,
