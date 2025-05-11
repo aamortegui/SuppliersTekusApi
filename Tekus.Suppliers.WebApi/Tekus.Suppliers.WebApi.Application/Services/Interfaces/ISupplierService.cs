@@ -10,6 +10,7 @@ namespace Tekus.Suppliers.WebApi.Application.Services.Interfaces
     public interface ISupplierService
     {
         Task<ResponseDto> GetAllSuppliersAsyc(SupplierFilterDto supplierFilterDto);
+        Task<ResponseDto> GetSupplierByIdAsync(Guid id);
         Task<ResponseDto> CreateSupplier(SupplierCreationDto supplierCreationDto);
     }
 }

@@ -48,17 +48,13 @@ namespace Tekus.Suppliers.WebApi.Controllers
         [HttpGet("{id}", Name = "GetSupplierById")]
         public async Task<IActionResult> GetSupplierById(Guid id)
         {
-            //var response = await _supplierService.GetSupplierById(id);
-            //if (response is not null && response.IsSuccess)
-            //{
-            //    return Ok(response);
-            //}
-            //else
-            //{
-            //    return BadRequest(new { message = response?.Message });
-            //}
+            var response = await _supplierService.GetSupplierByIdAsync(id);
+            if (response is not null && !response.IsSuccess)
+            {
+                return BadRequest(new { message = response?.Message });
+            }           
 
-            return Ok();
+            return Ok(response);
         }
 
         [HttpPost]

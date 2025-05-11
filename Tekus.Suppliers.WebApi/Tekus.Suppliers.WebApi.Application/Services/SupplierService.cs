@@ -44,6 +44,17 @@ namespace Tekus.Suppliers.WebApi.Application.Services
             };
         }
 
+        public async Task<ResponseDto> GetSupplierByIdAsync(Guid supplierId)
+        {
+            var supplier = await _supplierRepository.GetSupplierByIdAsync(supplierId);
+            return new ResponseDto()
+            {
+                IsSuccess = supplier.IsSuccess,
+                Message = supplier.Message,
+                Result = supplier.Result
+            };
+        }
+
         public async Task<ResponseDto> CreateSupplier(SupplierCreationDto supplierCreationDto)
         {
             var supplier = new Supplier()

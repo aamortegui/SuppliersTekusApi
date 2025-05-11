@@ -11,17 +11,21 @@ using Tekus.Suppliers.WebApi.Domain.Interfaces;
 using System.Linq.Dynamic.Core;
 using Tekus.Suppliers.WebApi.Infrastructure.Persistence.Entities;
 using Supplier = Tekus.Suppliers.WebApi.Domain.Entities.Supplier;
+using Microsoft.Extensions.Configuration;
 
 namespace Tekus.Suppliers.WebApi.Infrastructure.Repositories
 {
     public class SupplierRepository : ISupplierRepository
     {
         private readonly ServiceSuppliersDBContext _context;
-        
+        private readonly string[] _allowedOrderFields;
 
-        public SupplierRepository(ServiceSuppliersDBContext context)
+        public SupplierRepository(ServiceSuppliersDBContext context, IConfiguration config)
         {
-            _context = context;            
+            _context = context;
+            _allowedOrderFields = config
+            .GetSection("OrderSettings:AllowedOrderFields")
+            .Get<string[]>()!;
         }
 
         public async Task<Response> GetAllSuppliersAsync(SupplierFilter supplierFilter)
@@ -42,11 +46,11 @@ namespace Tekus.Suppliers.WebApi.Infrastructure.Repositories
                 }
                 if (!string.IsNullOrEmpty(supplierFilter.NIT))
                 {
-                    suppliersQueryabale = suppliersQueryabale.Where(x => x.NIT.Contains(supplierFilter.NIT));
-                }
+                    suppliersQueryabale = suppliersQueryabale.Where(x => x.NIT.Contains(supplierFilter.NIT));                }
 
-                var allowedOrderFields = new[] { "Name", "NIT", "Id" };
-                if (!string.IsNullOrEmpty(supplierFilter.OrderBy) && allowedOrderFields.Contains(supplierFilter.OrderBy))
+                
+                string? upperOrderBy = supplierFilter.OrderBy?.ToUpper();
+                if (!string.IsNullOrEmpty(supplierFilter.OrderBy) && _allowedOrderFields.Contains(upperOrderBy))
                 {
                     var direction = supplierFilter.IsDescending ? "descending" : "ascending";
                     suppliersQueryabale = suppliersQueryabale.OrderBy($"{supplierFilter.OrderBy} {direction}");
@@ -57,6 +61,30 @@ namespace Tekus.Suppliers.WebApi.Infrastructure.Repositories
                     .ToListAsync();
 
                 response.Result = suppliers;
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+        public async Task<Response> GetSupplierByIdAsync(Guid supplierId)
+        {
+            Response response = new Response();
+            try
+            {
+                var supplier = await _context.Suppliers
+                    .Include(x => x.CustomFields)
+                    .FirstOrDefaultAsync(x => x.Id == supplierId);
+                if (supplier is null)
+                {
+                    response.IsSuccess = false;
+                    response.Message = "Supplier not found";
+                    return response;
+                }
+                response.Result = supplier;
             }
             catch (Exception ex)
             {

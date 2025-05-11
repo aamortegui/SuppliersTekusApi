@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Tekus.Suppliers.WebApi.Infrastructure.Persistence.Entities
@@ -13,6 +14,7 @@ namespace Tekus.Suppliers.WebApi.Infrastructure.Persistence.Entities
         public Guid Id { get; set; }
         [Required]
         public Guid SupplierId { get; set; }
+        [JsonIgnore]
         public Supplier Supplier { get; set; }
 
         public string FieldName { get; set; } = string.Empty;
