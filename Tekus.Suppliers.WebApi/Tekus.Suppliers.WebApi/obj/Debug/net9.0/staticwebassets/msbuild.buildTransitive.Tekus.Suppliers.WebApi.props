@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\buildMultiTargeting\Tekus.Suppliers.WebApi.props" />
-</Project>

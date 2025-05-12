@@ -1,0 +1,53 @@
+###############
+# Build output
+###############
+**/bin/
+**/obj/
+*.dll
+*.exe
+*.pdb
+
+#####################
+# Visual Studio files
+#####################
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+#####################
+# .NET artifacts
+#####################
+project.lock.json
+project.fragment.lock.json
+artifacts/
+TestResults/
+*.csproj.user
+*.db-shm
+*.db-wal
+*.log
+
+##########################
+# JetBrains / VS Code
+##########################
+.idea/
+*.code-workspace
+.vscode/
+
+#########################
+# OS-specific
+#########################
+.DS_Store
+Thumbs.db
+
+#########################
+# File indexing
+#########################
+filecontentindex/
+
+#########################
+# NuGet Packages (optional)
+#########################
+# *.nupkg
+# packages/
