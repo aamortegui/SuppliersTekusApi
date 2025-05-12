@@ -95,5 +95,96 @@ namespace Tekus.Suppliers.WebApi.Infrastructure.Repositories
             }
             return response;
         }
+
+        public async Task<Response> CreateServiceAsync(ServiceCreation serviceCreation) 
+        {
+            Response response = new Response();
+            var serviceId = Guid.NewGuid();
+
+            var supplierIds = serviceCreation.SupplierServices.Select(s => s.SupplierId).ToList();
+            if (!supplierIds.Any())
+            {
+                response.IsSuccess = false;
+                response.Message = "At least one supplier must be provided.";
+                return response;
+            }
+
+            var countryIds = serviceCreation.ServiceCountries.Select(c => c.CountryId).ToList();
+            if (!countryIds.Any())
+            {
+                response.IsSuccess = false;
+                response.Message = "At least one country must be provided.";
+                return response;
+            }
+
+            //Validate if the service already exists
+            var existingService = await _context.Services
+                .Where(x => x.Name == serviceCreation.Name)
+                .Where(x => x.SupplierServices.Any(ss => supplierIds.Contains(ss.SupplierId)))
+                .Where(x => x.ServiceCountries.Any(sc => countryIds.Contains(sc.CountryId)))
+                .FirstOrDefaultAsync();                
+
+            if(existingService is not null)
+            {
+                response.IsSuccess = false;
+                response.Message = "Service already exists";
+                return response;
+            }
+
+            //Validate if the supplier exists
+            var supplierExists = await _context.Suppliers
+                .CountAsync(x => supplierIds.Contains(x.Id))== supplierIds.Count;
+
+            if (!supplierExists)
+            {
+                response.IsSuccess = false;
+                response.Message = "One or more suppliers not found";
+                return response;
+            }
+            //Validate if the country exists
+            var countryExists = await _context.Countries
+                .CountAsync(x=> countryIds.Contains(x.CountryId)) == countryIds.Count;
+            if (!supplierExists)
+            {
+                response.IsSuccess = false;
+                response.Message = "One or more countries not found";
+                return response;
+            }
+
+            //Create the service
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var serviceEntity = new Service()
+                {
+                    Id = serviceId,
+                    Name = serviceCreation.Name,
+                    PriceHour = serviceCreation.PriceHour,
+                    SupplierServices = serviceCreation.SupplierServices.Select(ss => new SupplierService
+                    {
+                        SupplierId = ss.SupplierId,
+                        ServiceId = serviceId
+                    }).ToList(),
+                    ServiceCountries = serviceCreation.ServiceCountries.Select(sc => new ServiceCountry
+                    {
+                        CountryId = sc.CountryId,
+                        ServiceId = serviceId
+                    }).ToList()
+                };
+                await _context.Services.AddAsync(serviceEntity);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                response.IsSuccess = true;
+                response.Result = serviceEntity;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                response.IsSuccess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
     }
 }

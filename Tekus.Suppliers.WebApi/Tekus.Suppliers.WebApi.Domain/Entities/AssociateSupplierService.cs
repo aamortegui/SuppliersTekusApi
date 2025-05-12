@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Tekus.Suppliers.WebApi.Infrastructure.Persistence.Entities;
 
-namespace Tekus.Suppliers.WebApi.Application.DTOs
+namespace Tekus.Suppliers.WebApi.Domain.Entities
 {
-    public class SupplierServiceDto
+    public class AssociateSupplierService
     {
         public Guid SupplierId { get; set; }
-        
     }
 }

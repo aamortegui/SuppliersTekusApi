@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Tekus.Suppliers.WebApi.Application.DTOs
 {
-    public class ServiceCountryDto
+    public class ServiceCreationCountryDto
     {
-        public Guid CountryId { get; set; }        
+        public Guid CountryId { get; set; }
     }
 }

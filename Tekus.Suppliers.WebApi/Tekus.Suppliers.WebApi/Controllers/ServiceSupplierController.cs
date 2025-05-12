@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.OutputCaching;
 using Tekus.Suppliers.WebApi.Application.DTOs;
 using Tekus.Suppliers.WebApi.Application.Services;
 using Tekus.Suppliers.WebApi.Application.Services.Interfaces;
+using Tekus.Suppliers.WebApi.Domain.Entities;
 using Tekus.Suppliers.WebApi.Infrastructure.Persistence.Entities;
 
 namespace Tekus.Suppliers.WebApi.Controllers
@@ -45,14 +46,13 @@ namespace Tekus.Suppliers.WebApi.Controllers
                 PriceHour = s.PriceHour,
                 ServiceCountries = s.ServiceCountries.Select(cf => new ServiceCountryDto
                 {
-                    CountryId = cf.CountryId,
-                    CommonName = cf.Country.CommonName,
-                    OfficialName = cf.Country.OfficialName,
+                    CountryId = cf.CountryId
+                    
                 }).ToList(),
                 SupplierServices = s.SupplierServices.Select(ss => new SupplierServiceDto
                 {
-                    SupplierId = ss.SupplierId,
-                    SupplierName = ss.Supplier.Name,
+                    SupplierId = ss.SupplierId
+                    
                 }).ToList()
             }).ToList();
 
@@ -72,5 +72,38 @@ namespace Tekus.Suppliers.WebApi.Controllers
         }
 
         //TODO: Implement the POST and PUT methods
+        [HttpPost]
+        public async Task<ActionResult<ResponseDto>> Post([FromBody] ServiceCreationDto serviceCreationDto)
+        {
+            var serviceCreated = await _serviceSupplier.CreateServiceAsync(serviceCreationDto);
+            if (!serviceCreated.IsSuccess || serviceCreated.Result == null)
+            {
+                return BadRequest(serviceCreated);
+            }
+            var serviceEntity = serviceCreated.Result as Service;
+
+            if (serviceEntity == null)
+            {
+                return BadRequest("Supplier creation failed or returned an unexpected result.");
+            }
+
+            var serviceResponse = new ServiceResponseDto
+            {
+                Id = serviceEntity.Id,
+                Name = serviceEntity.Name,
+                PriceHour = serviceEntity.PriceHour,
+                ServiceCountries = serviceEntity.ServiceCountries.Select(sc => new ServiceCountryDto
+                {
+                    CountryId = sc.CountryId                    
+                }).ToList(),
+                SupplierServices = serviceEntity.SupplierServices.Select(ss => new SupplierServiceDto
+                {
+                    SupplierId = ss.SupplierId                    
+                }).ToList()
+            };
+            await _outputCacheStore.EvictByTagAsync(cacheTag, default);
+            return CreatedAtRoute("GetServiceById", new { id = serviceResponse.Id }, serviceResponse);
+        }
+        
     }
 }
