@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Tekus.Suppliers.WebApi.Application.DTOs;
 using Tekus.Suppliers.WebApi.Application.Services;
 using Tekus.Suppliers.WebApi.Application.Services.Interfaces;
@@ -9,15 +12,21 @@ namespace Tekus.Suppliers.WebApi.Controllers
 {
     [Route("api/service-supplier")]
     [ApiController]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "isadmin")]
     public class ServiceSupplierController : ControllerBase
     {
         private readonly IServiceSupplierService _serviceSupplier;
-        public ServiceSupplierController(IServiceSupplierService serviceSupplierService)
+        private readonly IOutputCacheStore _outputCacheStore;
+        private const string cacheTag = "service";
+
+        public ServiceSupplierController(IServiceSupplierService serviceSupplierService, IOutputCacheStore outputCacheStore)
         {
             _serviceSupplier = serviceSupplierService;
+            _outputCacheStore = outputCacheStore;
         }
 
         [HttpGet]
+        [OutputCache(Tags = [cacheTag])]
         public async Task<IActionResult> GetSuppliers([FromQuery] ServiceFilterDto supplierFilterDto)
         {
             var response = await _serviceSupplier.GetAllServicesAsyc(supplierFilterDto);
@@ -61,5 +70,7 @@ namespace Tekus.Suppliers.WebApi.Controllers
 
             return Ok(response);
         }
+
+        //TODO: Implement the POST and PUT methods
     }
 }

@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Newtonsoft.Json;
 using Tekus.Suppliers.WebApi.Application.DTOs;
 using Tekus.Suppliers.WebApi.Application.Services.Interfaces;
@@ -9,15 +12,20 @@ namespace Tekus.Suppliers.WebApi.Controllers
 {
     [Route("api/supplier")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "isadmin")]
     public class SupplierController : ControllerBase
     {
         private readonly ISupplierService _supplierService;
-        public SupplierController(ISupplierService supplierService)
+        private readonly IOutputCacheStore _outputCacheStore;
+        private const string cacheTag = "supplier";
+        public SupplierController(ISupplierService supplierService, IOutputCacheStore outputCacheStore)
         {
             _supplierService = supplierService;
+            _outputCacheStore = outputCacheStore;
         }
 
         [HttpGet]
+        [OutputCache(Tags = [cacheTag])]
         public async Task<IActionResult> GetSuppliers([FromQuery] SupplierFilterDto supplierFilterDto)
         {
             var response = await _supplierService.GetAllSuppliersAsyc(supplierFilterDto);
@@ -86,7 +94,7 @@ namespace Tekus.Suppliers.WebApi.Controllers
                     FieldValue = cf.FieldValue
                 }).ToList()
             };
-
+            await _outputCacheStore.EvictByTagAsync(cacheTag, default);
             return CreatedAtRoute("GetSupplierById", new { id = supplier.Id }, supplier);
         }
 
@@ -102,6 +110,7 @@ namespace Tekus.Suppliers.WebApi.Controllers
                 return BadRequest("Supplier data is required.");
             }
             await _supplierService.UpdateSupplier(id, supplierCreationDto);
+            await _outputCacheStore.EvictByTagAsync(cacheTag, default);
 
             return NoContent();
         }

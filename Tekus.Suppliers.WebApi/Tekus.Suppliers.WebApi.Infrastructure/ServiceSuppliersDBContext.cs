@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ using Tekus.Suppliers.WebApi.Infrastructure.Persistence.Entities;
 
 namespace Tekus.Suppliers.WebApi.Infrastructure
 {
-    public class ServiceSuppliersDBContext : DbContext
+    public class ServiceSuppliersDBContext : IdentityDbContext
     {
         public ServiceSuppliersDBContext(DbContextOptions<ServiceSuppliersDBContext>options)
             : base(options)
