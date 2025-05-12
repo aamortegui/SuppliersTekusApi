@@ -156,7 +156,7 @@ namespace Tekus.Suppliers.WebApi.Infrastructure.Repositories
 
                 if (existingSupplier is null)
                 {
-                    throw new KeyNotFoundException("Supplier not found");
+                    throw new Exception("Supplier not found");
                 }
                 if (!string.IsNullOrEmpty(supplier.Name))
                     existingSupplier.Name = supplier.Name;

@@ -74,5 +74,24 @@ namespace Tekus.Suppliers.WebApi.Application.Services
                 Result = response.Result
             };
         }
+
+        public async Task UpdateServiceAsync(Guid id, ServiceCreationDto serviceCreationDto)
+        {
+            var service = new ServiceCreation()
+            {
+                Name = serviceCreationDto.Name,
+                PriceHour = serviceCreationDto.PriceHour,
+                ServiceCountries = serviceCreationDto.ServiceCountries.Select(sc => new ServiceCreationCountry()
+                {
+                    CountryId = sc.CountryId
+                }).ToList(),
+                SupplierServices = serviceCreationDto.SupplierServices.Select(ss => new AssociateSupplierService()
+                {
+                    SupplierId = ss.SupplierId
+                }).ToList()
+            };
+
+            await _serviceRepository.UpdateServiceAsync(id, service);
+        }
     }
 }

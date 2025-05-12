@@ -12,5 +12,6 @@ namespace Tekus.Suppliers.WebApi.Domain.Interfaces
         Task<Response> GetAllServicesAsync(ServiceFilter serviceFilter);
         Task<Response> GetServiceByIdAsync(Guid id);
         Task<Response> CreateServiceAsync(ServiceCreation serviceCreation);
+        Task UpdateServiceAsync(Guid id, ServiceCreation serviceCreation);
     }
 }

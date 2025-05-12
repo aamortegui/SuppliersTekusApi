@@ -84,7 +84,7 @@ namespace Tekus.Suppliers.WebApi.Controllers
 
             if (serviceEntity == null)
             {
-                return BadRequest("Supplier creation failed or returned an unexpected result.");
+                return BadRequest("Service creation failed or returned an unexpected result.");
             }
 
             var serviceResponse = new ServiceResponseDto
@@ -105,5 +105,23 @@ namespace Tekus.Suppliers.WebApi.Controllers
             return CreatedAtRoute("GetServiceById", new { id = serviceResponse.Id }, serviceResponse);
         }
         
+        [HttpPut("{id}", Name = "Edit-Service")]
+        public async Task<ActionResult> Put(Guid id, [FromBody] ServiceCreationDto serviceCreationDto)
+        {
+            if (id == Guid.Empty)
+            {
+                return BadRequest("Invalid service ID.");
+            }
+            if (serviceCreationDto == null)
+            {
+                return BadRequest("Service data is required.");
+            }
+
+            await _serviceSupplier.UpdateServiceAsync(id, serviceCreationDto);
+
+            await _outputCacheStore.EvictByTagAsync(cacheTag, default);
+
+            return NoContent();
+        }
     }
 }
