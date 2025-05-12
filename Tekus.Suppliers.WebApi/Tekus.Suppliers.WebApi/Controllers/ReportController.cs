@@ -7,6 +7,9 @@ using Tekus.Suppliers.WebApi.Application.Services.Interfaces;
 
 namespace Tekus.Suppliers.WebApi.Controllers
 {
+    /// <summary>
+    /// Controller for generating reports
+    /// </summary>
     [Route("api/report")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "isadmin")]
@@ -20,7 +23,10 @@ namespace Tekus.Suppliers.WebApi.Controllers
             _indicatorService = indicatorService;
             _outputCacheStore = outputCacheStore;
         }
-
+        /// <summary>
+        /// Generate a report of the country summary
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("generate-report")]
         [OutputCache(Tags = [cacheTag])]
         public async Task<IActionResult> GenerateReport()

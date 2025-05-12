@@ -11,6 +11,9 @@ using Tekus.Suppliers.WebApi.Infrastructure.Persistence.Entities;
 
 namespace Tekus.Suppliers.WebApi.Controllers
 {
+    /// <summary>
+    /// Controller for managing service suppliers.
+    /// </summary>
     [Route("api/service-supplier")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "isadmin")]
@@ -26,6 +29,13 @@ namespace Tekus.Suppliers.WebApi.Controllers
             _outputCacheStore = outputCacheStore;
         }
 
+        /// <summary>
+        /// Retrieves a list of suppliers based on the provided filter.
+        /// </summary>
+        /// <param name="supplierFilterDto"></param>
+        /// <returns>Retrieves a list of services with suppliers and countries</returns>
+        /// <response code="200">Returns a list of suppliers</response>
+        /// <response code="400">If the request is invalid</response>
         [HttpGet]
         [OutputCache(Tags = [cacheTag])]
         public async Task<IActionResult> GetSuppliers([FromQuery] ServiceFilterDto supplierFilterDto)
@@ -58,7 +68,13 @@ namespace Tekus.Suppliers.WebApi.Controllers
 
             return Ok(suppliers);
         }
-
+        /// <summary>
+        /// Retrieves a specific service by its ID.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>Retrieves a specific service</returns>
+        /// <response code="200">Returns the service with the specified ID</response>
+        /// <response code="400">If the service is not found</response>
         [HttpGet("{id}", Name = "GetServiceById")]
         public async Task<IActionResult> GetServiceById(Guid id)
         {
@@ -70,10 +86,29 @@ namespace Tekus.Suppliers.WebApi.Controllers
 
             return Ok(response);
         }
-        
+        /// <summary>
+        /// Creates a new service.
+        /// </summary>
+        /// <param name="serviceCreationDto"></param>
+        /// <returns>New service created</returns>
+        /// <response code="201">Returns the created service</response>
+        /// <response code="400">If the service was not created</response>
         [HttpPost]
         public async Task<ActionResult<ResponseDto>> Post([FromBody] ServiceCreationDto serviceCreationDto)
         {
+            if (serviceCreationDto == null)
+            {
+                return BadRequest("Service data is required.");
+            }
+            if (string.IsNullOrEmpty(serviceCreationDto.Name))
+            {
+                return BadRequest("Service name is required.");
+            }
+            if (serviceCreationDto.PriceHour <= 0)
+            {
+                return BadRequest("Service price must be greater than zero.");
+            }
+            
             var serviceCreated = await _serviceSupplier.CreateServiceAsync(serviceCreationDto);
             if (!serviceCreated.IsSuccess || serviceCreated.Result == null)
             {
@@ -103,7 +138,14 @@ namespace Tekus.Suppliers.WebApi.Controllers
             await _outputCacheStore.EvictByTagAsync(cacheTag, default);
             return CreatedAtRoute("GetServiceById", new { id = serviceResponse.Id }, serviceResponse);
         }
-        
+        /// <summary>
+        /// Updates an existing service.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="serviceCreationDto"></param>
+        /// <returns></returns>
+        /// <response code="204">Returns no content if the update was successful</response>
+        /// <response code="400">If the service ID is invalid or the update failed</response>
         [HttpPut("{id}", Name = "Edit-Service")]
         public async Task<ActionResult> Put(Guid id, [FromBody] ServiceCreationDto serviceCreationDto)
         {

@@ -11,6 +11,9 @@ using Tekus.Suppliers.WebApi.Application.DTOs.UserDTOs;
 
 namespace Tekus.Suppliers.WebApi.Controllers
 {
+    /// <summary>
+    /// Controller for managing users.
+    /// </summary>
     [Route("api/users")]
     [ApiController]
     public class UsersController : ControllerBase
@@ -29,7 +32,13 @@ namespace Tekus.Suppliers.WebApi.Controllers
             _configuration = configuration;            
             _outputCacheStore = outputCacheStore;
         }
-
+        /// <summary>
+        /// Registers a new user.
+        /// </summary>
+        /// <param name="userCredetialsDTO"></param>
+        /// <returns>Return JWT</returns>
+        /// <response code="200">Returns a JWT token</response>
+        /// <response code="400">If the registration fails</response>
         [HttpPost("register")]
         [AllowAnonymous]
         public async Task<ActionResult<AuthenticationResponseDTO>> Register(UserCredetialsDTO userCredetialsDTO)
@@ -52,7 +61,13 @@ namespace Tekus.Suppliers.WebApi.Controllers
                 return BadRequest(result.Errors);
             }
         }
-
+        /// <summary>
+        /// Logs in a user and returns a JWT token.
+        /// </summary>
+        /// <param name="userCredetialsDTO"></param>
+        /// <returns>Returns a JWT token</returns>
+        /// <response code="200">Returns a JWT token</response>
+        /// <response code="400">If the login fails</response>
         [HttpPost("login")]
         [AllowAnonymous]
         public async Task<ActionResult<AuthenticationResponseDTO>> Login(UserCredetialsDTO userCredetialsDTO)
@@ -79,7 +94,13 @@ namespace Tekus.Suppliers.WebApi.Controllers
 
             }
         }
-
+        /// <summary>
+        /// Creates a new admin claim for a user
+        /// </summary>
+        /// <param name="editClaimDTO"></param>
+        /// <returns></returns>
+        /// <response code="204">Returns no content</response>
+        /// <response code="404">If the user is not found</response>
         [HttpPost("makeadmin")]
         public async Task<IActionResult> MakeAdmin(EditClaimDTO editClaimDTO)
         {
@@ -92,7 +113,13 @@ namespace Tekus.Suppliers.WebApi.Controllers
             await _userManager.AddClaimAsync(user, new Claim("isadmin", "true"));
             return NoContent();
         }
-
+        /// <summary>
+        /// Removes the admin claim from a user.
+        /// </summary>
+        /// <param name="editClaimDTO"></param>
+        /// <returns></returns>
+        /// <response code="204">Returns no content</response>
+        /// <response code="404">If the user is not found</response>
         [HttpPost("removeadmin")]
         public async Task<IActionResult> RemoveAdmin(EditClaimDTO editClaimDTO)
         {

@@ -8,6 +8,9 @@ using Tekus.Suppliers.WebApi.Infrastructure.Persistence.Entities;
 
 namespace Tekus.Suppliers.WebApi.Controllers
 {
+    /// <summary>
+    /// Controller for managing countries.
+    /// </summary>
     [Route("api/country")]
     [ApiController]
     public class CountryController : ControllerBase
@@ -23,7 +26,13 @@ namespace Tekus.Suppliers.WebApi.Controllers
             _outputCacheStore = outputCacheStore;
             _countryLocalService = countryLocalService;
         }
-
+        /// <summary>
+        /// Retrieves all countries with pagination from external API.
+        /// </summary>
+        /// <param name="pagination"></param>
+        /// <returns>Retrieves all countries</returns>
+        /// <RESPONSE code="200">Returns a list of countries</RESPONSE>
+        /// <response code="400">Returns an error message if the request fails</response>
         [HttpGet("all-countries")]
         [OutputCache(Tags = [cacheTag])]
         public async Task<IActionResult> GetCountries([FromQuery] PaginationDTO pagination)
@@ -40,6 +49,13 @@ namespace Tekus.Suppliers.WebApi.Controllers
                 return BadRequest(new { message = response?.Message });
             }            
         }
+        /// <summary>
+        /// Retrieves a specific country by name from external API.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns>Retrieve a specific country</returns>
+        /// <response code="200">Returns the country details</response>
+        /// <response code="400">Returns an error message if the request fails</response>
         [HttpGet("get-country/{name}")]
         [OutputCache(Tags = [cacheTag])]
         public async Task<IActionResult> GetCountry(string name)
@@ -55,7 +71,13 @@ namespace Tekus.Suppliers.WebApi.Controllers
                 return BadRequest(new { message = response?.Message });
             }
         }
-
+        /// <summary>
+        /// Retrieves all countries from the local database with pagination.
+        /// </summary>
+        /// <param name="countryFilterDto"></param>
+        /// <returns>Retrieves all countries from the local database</returns>
+        /// <response code="200">Returns a list of countries</response>
+        /// <response code="400">Returns an error message if the request fails</response>
         [HttpGet("get-local-country")]
         [OutputCache(Tags = [cacheTag])]
         public async Task<IActionResult> GetLocalCountries([FromQuery] CountryFilterDto countryFilterDto)

@@ -10,6 +10,9 @@ using Tekus.Suppliers.WebApi.Infrastructure.Persistence.Entities;
 
 namespace Tekus.Suppliers.WebApi.Controllers
 {
+    /// <summary>
+    /// Controller for managing suppliers.
+    /// </summary>
     [Route("api/supplier")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "isadmin")]
@@ -23,7 +26,13 @@ namespace Tekus.Suppliers.WebApi.Controllers
             _supplierService = supplierService;
             _outputCacheStore = outputCacheStore;
         }
-
+        /// <summary>
+        /// Retrieves a list of suppliers based on the provided filter criteria.
+        /// </summary>
+        /// <param name="supplierFilterDto"></param>
+        /// <returns>Retrieves a list of suppliers filtered</returns>
+        /// <response code="200">Returns a list of suppliers</response>
+        /// <response code="400">If the filter criteria is invalid</response>
         [HttpGet]
         [OutputCache(Tags = [cacheTag])]
         public async Task<IActionResult> GetSuppliers([FromQuery] SupplierFilterDto supplierFilterDto)
@@ -52,7 +61,13 @@ namespace Tekus.Suppliers.WebApi.Controllers
 
             return Ok(suppliers);
         }
-
+        /// <summary>
+        /// Retrieves a supplier by its ID.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>Retrieve a supplier</returns>
+        /// <response code="200">Returns the supplier</response>
+        /// <response code="400">If the supplier ID is invalid</response>
         [HttpGet("{id}", Name = "GetSupplierById")]
         public async Task<IActionResult> GetSupplierById(Guid id)
         {
@@ -64,10 +79,28 @@ namespace Tekus.Suppliers.WebApi.Controllers
 
             return Ok(response);
         }
-
+        /// <summary>
+        /// Creates a new supplier.
+        /// </summary>
+        /// <param name="supplierCreationDto"></param>
+        /// <returns>Retrieve the created supplier info</returns>
+        /// <response code="201">Returns the created supplier</response>
+        /// <response code="400">If the supplier data is invalid</response>
         [HttpPost]
         public async Task<ActionResult<ResponseDto>> Post([FromBody] SupplierCreationDto supplierCreationDto)
         {
+            if (supplierCreationDto == null)
+            {
+                return BadRequest("Supplier data is required.");
+            }
+            if (string.IsNullOrEmpty(supplierCreationDto.Name))
+            {
+                return BadRequest("Supplier name is required.");
+            }
+            if (string.IsNullOrEmpty(supplierCreationDto.NIT))
+            {
+                return BadRequest("Supplier NIT is required.");
+            }
             var supplierCreated = await _supplierService.CreateSupplier(supplierCreationDto);
 
             if (!supplierCreated.IsSuccess || supplierCreated.Result == null)
@@ -97,7 +130,14 @@ namespace Tekus.Suppliers.WebApi.Controllers
             await _outputCacheStore.EvictByTagAsync(cacheTag, default);
             return CreatedAtRoute("GetSupplierById", new { id = supplier.Id }, supplier);
         }
-
+        /// <summary>
+        /// Updates an existing supplier.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="supplierCreationDto"></param>
+        /// <returns></returns>
+        /// <response code="204">Returns no content</response>
+        /// <response code="400">If the supplier ID is invalid</response>
         [HttpPut("{id}", Name ="Edit")]
         public async Task<ActionResult>Put(Guid id, [FromBody] SupplierCreationDto supplierCreationDto)
         {
