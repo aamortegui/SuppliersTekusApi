@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.OutputCaching;
 using Newtonsoft.Json;
 using Tekus.Suppliers.WebApi.Application.DTOs;
 using Tekus.Suppliers.WebApi.Application.Services.Interfaces;
+using Tekus.Suppliers.WebApi.Infrastructure.Persistence.Entities;
 
 namespace Tekus.Suppliers.WebApi.Controllers
 {
@@ -13,11 +14,14 @@ namespace Tekus.Suppliers.WebApi.Controllers
     {
         private readonly ICountryService _countryService;
         private readonly IOutputCacheStore _outputCacheStore;
+        private readonly ICountryLocalService _countryLocalService;
         private const string cacheTag = "countries";
-        public CountryController(ICountryService countryService, IOutputCacheStore outputCacheStore)
+        public CountryController(ICountryService countryService, IOutputCacheStore outputCacheStore, 
+            ICountryLocalService countryLocalService)
         {
             _countryService = countryService;
             _outputCacheStore = outputCacheStore;
+            _countryLocalService = countryLocalService;
         }
 
         [HttpGet("all-countries")]
@@ -50,6 +54,29 @@ namespace Tekus.Suppliers.WebApi.Controllers
             {
                 return BadRequest(new { message = response?.Message });
             }
+        }
+
+        [HttpGet("get-local-country")]
+        [OutputCache(Tags = [cacheTag])]
+        public async Task<IActionResult> GetLocalCountries([FromQuery] CountryFilterDto countryFilterDto)
+        {
+            var response = await _countryLocalService.GetAllCountriesLocalAsync(countryFilterDto);
+
+            if (!response.IsSuccess || response.Result == null)
+            {
+                return BadRequest(response);
+            }
+
+            var countryEntities = response.Result as List<Country>;
+
+            var countries = countryEntities?.Select(c => new CountryLocalDto
+            {
+                CountryId = c.CountryId,
+                CommonName = c.CommonName,
+                OfficialName = c.OfficialName
+            }).ToList();
+
+            return Ok(countries);
         }
     }
 }

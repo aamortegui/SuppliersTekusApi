@@ -63,6 +63,11 @@ builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
 builder.Services.AddScoped<IServiceSupplierService, ServiceSupplierService>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
+builder.Services.AddScoped<IIndicatorService, IndicatorService>();
+builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<ICountryLocalService, CountryLocalService>();
+builder.Services.AddScoped<ICountryLocalRepository, CountryLocalRepository>();
+
 StaticDetails.CountryAPIBase = builder.Configuration["ServiceUrls:CountryAPI"];
 
 builder.Services.AddDbContext<ServiceSuppliersDBContext>(options =>

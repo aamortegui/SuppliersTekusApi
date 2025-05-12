@@ -13,7 +13,7 @@ namespace Tekus.Suppliers.WebApi.Controllers
 {
     [Route("api/service-supplier")]
     [ApiController]
-    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "isadmin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "isadmin")]
     public class ServiceSupplierController : ControllerBase
     {
         private readonly IServiceSupplierService _serviceSupplier;
@@ -70,8 +70,7 @@ namespace Tekus.Suppliers.WebApi.Controllers
 
             return Ok(response);
         }
-
-        //TODO: Implement the POST and PUT methods
+        
         [HttpPost]
         public async Task<ActionResult<ResponseDto>> Post([FromBody] ServiceCreationDto serviceCreationDto)
         {
